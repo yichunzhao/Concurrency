@@ -20,14 +20,13 @@ public class ExecutorServiceSingleThread {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         executorService.execute(() -> System.out.println("Hello XXX"));
 
-        //Submit asynchronous tasks(callable), to the queue.
-        //If you don’t want your Callable to return a value, you can create
-        //it using Callable<Void>.
-        Future<String> future = executorService.submit(()-> "callable task");
+        //Submit asynchronous tasks(callable), to the queue. If you don’t want
+        // your Callable to return a value, you can create it using Callable<Void>.
+        Future<String> future = executorService.submit(() -> "callable task");
 
-        if(future.isDone()){
+        if (future.isDone()) {
             String result = future.get();
-            System.out.println("Result: "+ result);
+            System.out.println("Result: " + result);
         }
 
     }
