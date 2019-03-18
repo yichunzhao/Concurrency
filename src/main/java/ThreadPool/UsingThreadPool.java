@@ -21,7 +21,7 @@ class HeavyTask implements Runnable {
     public void run() {
         System.out.println("running task :" + id);
         try {
-            Thread.sleep(200);
+            Thread.sleep(1200);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -33,9 +33,11 @@ public class UsingThreadPool {
 
     public static void main(String... args) {
 
-        ExecutorService executorService = Executors.newFixedThreadPool(2);
+        ExecutorService executorService = Executors.newFixedThreadPool(6);
 
-        IntStream.range(0, 6).forEach(i -> executorService.submit(new HeavyTask(i)));
+        IntStream.rangeClosed(0, 5).forEach(i -> executorService.submit(new HeavyTask(i)));
+
+        System.out.println("tasks are submitted");
 
         executorService.shutdown();
 
