@@ -17,7 +17,7 @@ public class PrintThreadsInSequence {
         //print A
         new Thread(() -> {
             synchronized (lock) {
-                if (flag != 1) {
+                while (flag != 1) {
                     try {
                         lock.wait();
                     } catch (InterruptedException e) {
@@ -34,7 +34,7 @@ public class PrintThreadsInSequence {
         //print B
         new Thread(() -> {
             synchronized (lock) {
-                if (flag != 2) {
+                while (flag != 2) {
                     try {
                         lock.wait();
                     } catch (InterruptedException e) {
@@ -53,21 +53,38 @@ public class PrintThreadsInSequence {
         //print C
         new Thread(() -> {
             synchronized (lock) {
-                if (flag != 3) {
+                while (flag != 3) {
                     try {
                         lock.wait();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 }
-                ;
 
                 System.out.print("C");
-                flag = 1;
+                flag = 4;
                 lock.notify();
             }
         }
         ).start();
+
+        //print D
+        new Thread(() -> {
+
+            synchronized (lock) {
+                //waiting for flag = 4
+                while (flag != 4) {
+                    try {
+                        lock.wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                System.out.println("D");
+                flag = 5;
+                lock.notify();
+            }
+        }).start();
 
 
     }

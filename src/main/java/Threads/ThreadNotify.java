@@ -19,11 +19,12 @@ class Developer implements Runnable {
 
     @Override
     public void run() {
-        //achieve designer's lock
+        //achieve designer  monitor and lock it.
         synchronized (designer) {
 
             try {
                 designer.wait();
+
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
