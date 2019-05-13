@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentMap;
  * @author YNZ
  */
 public class UsingConcurrentHashMap {
-
+    //lock free
     public static void main(String... args) throws InterruptedException {
 
         final ConcurrentMap<String, Integer> concurrentMap = new ConcurrentHashMap<>();
