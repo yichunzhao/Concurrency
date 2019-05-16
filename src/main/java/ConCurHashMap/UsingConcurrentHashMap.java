@@ -23,9 +23,22 @@ public class UsingConcurrentHashMap {
 
         new Thread(() -> {
             concurrentMap.put("Lenovo", 1);
-            concurrentMap.put("Dell", 1);
+            concurrentMap.put("Dell", 1677);
         }, "th2"
         ).start();
+
+        new Thread(() -> {
+            concurrentMap.put("Thinkpad", 1);
+            concurrentMap.put("Aser", 1);
+        }, "th3"
+        ).start();
+
+        new Thread(() -> {
+            System.out.println(concurrentMap.get("Dell"));
+        }, "th4"
+        ).start();
+
+
 
         Thread.sleep(100);
 
