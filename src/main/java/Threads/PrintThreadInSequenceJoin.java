@@ -55,8 +55,8 @@ public class PrintThreadInSequenceJoin {
     public static void main(String[] args) {
 
         Thread a = new Thread(new A());
-        Thread b = new Thread(new B(a));
-        Thread c = new Thread(new C(b));
+        Thread b = new Thread(new B(a)); //b depends on a
+        Thread c = new Thread(new C(b)); //c depends on b
 
         a.start();
         b.start();
