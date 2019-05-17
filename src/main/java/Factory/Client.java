@@ -26,7 +26,7 @@ class TextProcessor implements App {
 abstract class AppFactory {
     abstract public App getApp();
 
-    public App getIntance(){
+    public App getInstance(){
         return getApp();
     }
 }
@@ -37,6 +37,7 @@ class TextProcessorFactory extends AppFactory{
     public App getApp() {
         return new TextProcessor();
     }
+
 }
 
 class WordProcessorFactory extends AppFactory{
@@ -52,7 +53,7 @@ public class Client {
     public static void main(String... args) {
 
         AppFactory textFactory = new TextProcessorFactory();
-        textFactory.getIntance().open("dd");
+        textFactory.getInstance().open("dd");
 
 
 
