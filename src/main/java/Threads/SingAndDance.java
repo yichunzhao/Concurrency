@@ -17,6 +17,7 @@ public class SingAndDance {
         Thread newThread = new Thread(sing);
 
         //however only current thread is created, but not Sing thread.
+        //so it prints once.
         newThread.start();
     }
 }
