@@ -49,7 +49,6 @@ class C implements Runnable {
     }
 }
 
-
 public class PrintThreadInSequenceJoin {
 
     public static void main(String[] args) {
