@@ -22,6 +22,5 @@ public class StopAThreadByVolatileVar {
 
         //Stop the thread by exit flag.
         exit = true;
-
     }
 }
