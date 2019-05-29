@@ -20,6 +20,5 @@ public class SyncMap {
         Thread.sleep(500);
         System.out.println(synchronisedMap.toString());
 
-
     }
 }
