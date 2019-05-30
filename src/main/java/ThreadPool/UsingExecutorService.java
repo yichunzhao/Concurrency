@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -71,9 +72,11 @@ public class UsingExecutorService {
         }
         //commit tasks to executor to implement.
 
+        executorService.awaitTermination(1000, TimeUnit.MICROSECONDS);
+
         end = Instant.now();
 
-        System.out.println("cached thread pool time cost : " + Duration.between(start,end));
+        System.out.println("cached thread pool time cost : " + Duration.between(start, end));
 
 
         Thread.sleep(1000);
@@ -87,9 +90,11 @@ public class UsingExecutorService {
 
         }
 
+        cachedExecutor.awaitTermination(1000, TimeUnit.MICROSECONDS);
+
         end = Instant.now();
 
-        System.out.println("cached thread pool time cost : " + Duration.between(start,end));
+        System.out.println("cached thread pool time cost : " + Duration.between(start, end));
 
     }
 }
