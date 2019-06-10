@@ -1,61 +1,54 @@
 package Factory;
 
-/**
- * @author YNZ
- */
-
+/** @author YNZ */
 interface App {
-    void open(String fileName);
+  void open(String fileName);
 }
 
 class WordProcessor implements App {
 
-    public void open(String fileName) {
-        System.out.println("open by word");
-    }
+  public void open(String fileName) {
+    System.out.println("open by word");
+  }
 }
 
 class TextProcessor implements App {
 
-    @Override
-    public void open(String fileName) {
-        System.out.println("opne by text ");
-    }
+  @Override
+  public void open(String fileName) {
+    System.out.println("opne by text ");
+  }
 }
 
 abstract class AppFactory {
-    abstract public App getApp();
+  public abstract App getApp();
 
-    public App getInstance(){
-        return getApp();
-    }
+  public App getInstance() {
+    return getApp();
+  }
 }
 
-class TextProcessorFactory extends AppFactory{
+class TextProcessorFactory extends AppFactory {
 
-    @Override
-    public App getApp() {
-        return new TextProcessor();
-    }
-
+  @Override
+  public App getApp() {
+    return new TextProcessor();
+  }
 }
 
-class WordProcessorFactory extends AppFactory{
+class WordProcessorFactory extends AppFactory {
 
-    @Override
-    public App getApp() {
-        return new WordProcessor();
-    }
+  @Override
+  public App getApp() {
+    return new WordProcessor();
+  }
 }
 
 public class Client {
 
-    public static void main(String... args) {
+  public static void main(String... args) {
 
-        AppFactory textFactory = new TextProcessorFactory();
-        textFactory.getInstance().open("dd");
-
-
-
-    }
+    AppFactory textFactory = new TextProcessorFactory();
+    textFactory.getInstance().open("dd");
+  }
 }

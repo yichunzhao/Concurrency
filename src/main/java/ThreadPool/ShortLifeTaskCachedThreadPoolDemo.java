@@ -7,22 +7,19 @@ import java.util.stream.IntStream;
 
 public class ShortLifeTaskCachedThreadPoolDemo {
 
-    public static void main(String[] args) throws InterruptedException {
-        ExecutorService service = Executors.newCachedThreadPool();
-        IntStream.rangeClosed(0, 100).forEach(i -> service.execute(new LightTask()));
+  public static void main(String[] args) throws InterruptedException {
+    ExecutorService service = Executors.newCachedThreadPool();
+    IntStream.rangeClosed(0, 100).forEach(i -> service.execute(new LightTask()));
+    service.awaitTermination(10, TimeUnit.SECONDS);
+    service.shutdown();
+  }
 
-        service.awaitTermination(10, TimeUnit.SECONDS);
+  private static class LightTask implements Runnable {
 
-        service.shutdown();
+    @Override
+    public void run() {
+
+      System.out.println("current thread: " + Thread.currentThread().getName());
     }
-
-    private static class LightTask implements Runnable {
-
-        @Override
-        public void run() {
-
-            System.out.println("current thread: " + Thread.currentThread().getName());
-
-        }
-    }
+  }
 }
