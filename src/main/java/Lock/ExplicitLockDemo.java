@@ -1,15 +1,17 @@
 package Lock;
 /**
  * Locks(explicit lock): java.util.concurrent.locks. synchronize modifier is an implicit lock. Using
- * explicit lock vs implicit lock. Explicit lock: (1) providing a fairness config. so that longest waiting
- * thread gets the lock first.(by default); otherwise, config via the constructor. (2) explicit lock offers a try lock
- * method. if cannot achieve the lock and may time out, get back. 3) explicit can be lock many times and unlock many
- * times. 4) an explicit lock can be locked in one method, and unlocked in another method.
+ * explicit lock vs implicit lock. Explicit lock: (1) providing a fairness config. so that longest
+ * waiting thread gets the lock first.(by default); otherwise, config via the constructor. (2)
+ * explicit lock offers a try lock method. if cannot achieve the lock and may time out, get back. 3)
+ * explicit can be lock many times and unlock many times. 4) an explicit lock can be locked in one
+ * method, and unlocked in another method.
  *
- *  for an implicit (synchronized) method or block, once a thread try to achieve its lock, then it cannot quit.
+ * <p>for an implicit (synchronized) method or block, once a thread try to achieve its lock, then it
+ * cannot quit.
  *
- *  why the ReentrantLock is called Reentrant?  once a thread achieve the lock it may re-use this lock in a recursive
- *  call. that is the reason.
+ * <p>why the ReentrantLock is called Reentrant? once a thread achieve the lock it may re-use this
+ * lock in a recursive call. that is the reason.
  */
 import java.util.HashMap;
 import java.util.Map;
