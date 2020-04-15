@@ -3,11 +3,17 @@ package liveness;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+/**
+ * After a thread acquired lock, it cannot release it due to exceptional reasons. It causes all the
+ * rest threads blocked. The following code aims to simulate this scenario.
+ *
+ * <p>Adding try catch block and always unlock in the finally block.
+ */
+public class AbandonedLockDemo {
 
-public class DeadlockDemo {
-  static class Philosopher implements Runnable {
+  private static class Philosopher implements Runnable {
 
-    private static int sushiAmount = 20_000;
+    private static int sushiAmount = 20;
 
     private Lock chopStick1;
 
@@ -32,20 +38,19 @@ public class DeadlockDemo {
         chopStick1.lock();
         chopStick2.lock();
 
-        // simulating the time cost to pick up one sushi.
-        try {
-          Thread.sleep(10);
-        } catch (InterruptedException e) {
-          e.printStackTrace();
-        }
-
         // if there is still one on the plate, then picking up. Otherwise, do nothing.
-        if (sushiAmount > 0) sushiAmount--;
+        try {
+          if (sushiAmount > 0) sushiAmount--;
 
-        System.out.println(this.name + " is taking one Sushi. remaining: " + sushiAmount);
+          System.out.println(this.name + " is taking one Sushi. remaining: " + sushiAmount);
 
-        chopStick2.unlock();
-        chopStick1.unlock();
+          if (sushiAmount == 10) throw new IllegalStateException("a simulated exception happens");
+        } catch (IllegalStateException e) {
+          e.printStackTrace();
+        } finally {
+          chopStick2.unlock();
+          chopStick1.unlock();
+        }
       }
     }
   }
@@ -56,7 +61,9 @@ public class DeadlockDemo {
 
     // there are two philosophers want to eat sushi.
     Thread barron = new Thread(new Philosopher(chopStickA, chopStickB, "Barron"));
-    Thread olivia = new Thread(new Philosopher(chopStickB, chopStickA, "Olivia"));
+    Thread olivia = new Thread(new Philosopher(chopStickA, chopStickB, "Olivia"));
+    barron.setName("Thread-barron");
+    olivia.setName("Thread-olivia");
 
     barron.start();
     olivia.start();
