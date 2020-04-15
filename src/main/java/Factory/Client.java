@@ -16,7 +16,7 @@ class TextProcessor implements App {
 
   @Override
   public void open(String fileName) {
-    System.out.println("opne by text ");
+    System.out.println("open by text ");
   }
 }
 

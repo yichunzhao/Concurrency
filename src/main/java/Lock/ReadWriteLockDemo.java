@@ -14,7 +14,7 @@ class CalendarUser implements Runnable {
 
   private static int today = 0;
 
-  private static ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
+  private static ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
 
   private static Lock readMarker = readWriteLock.readLock();
   private static Lock writeMarker = readWriteLock.writeLock();
@@ -38,7 +38,7 @@ class CalendarUser implements Runnable {
 
       } else { // reader- check to see what today is
         readMarker.lock();
-        System.out.println(this.name + " sees that today is " + WEEKDAYS[today]);
+        System.out.println(this.name + " sees that today is " + WEEKDAYS[today] + " total reader: " + readWriteLock.getReadLockCount());
         readMarker.unlock();
       }
     }
