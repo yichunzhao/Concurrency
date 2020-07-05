@@ -15,7 +15,6 @@ public class SoupBowl {
     private int seqNum;
 
     void addSoup() {
-        //it takes 300 ms to fill up a bowl of soup.
         try {
             Thread.sleep(200);
         } catch (InterruptedException e) {
