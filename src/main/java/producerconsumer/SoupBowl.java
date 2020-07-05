@@ -17,7 +17,7 @@ public class SoupBowl {
     void addSoup() {
         //it takes 300 ms to fill up a bowl of soup.
         try {
-            Thread.sleep(300);
+            Thread.sleep(200);
         } catch (InterruptedException e) {
             log.error("Thread exception: ", e);
         }
@@ -27,7 +27,7 @@ public class SoupBowl {
 
     void eatSoup() {
         try {
-            Thread.sleep(200);
+            Thread.sleep(400);
         } catch (InterruptedException e) {
             log.error("Thread exception:", e);
         }

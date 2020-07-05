@@ -14,7 +14,6 @@ public class SoupConsumer implements Runnable {
     public void run() {
         while (true) {
             try {
-                log.info("Pick up a soup bowl.");
                 SoupBowl picked = servingBoard.pickUpOneBowlSoup();
 
                 if (!picked.isEmpty()) {
