@@ -27,7 +27,7 @@ class RecursiveSum extends RecursiveTask<Long> {
             //divide into left and right sub-problem.
             RecursiveSum left = new RecursiveSum(low, mid);
             RecursiveSum right = new RecursiveSum(mid + 1, high);
-            left.fork();
+            left.fork();//left fork and implemented
 
             return right.compute() + left.join();
         }
