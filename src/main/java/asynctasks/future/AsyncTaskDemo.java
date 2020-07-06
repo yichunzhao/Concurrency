@@ -1,4 +1,4 @@
-package asynctasks;
+package asynctasks.future;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
