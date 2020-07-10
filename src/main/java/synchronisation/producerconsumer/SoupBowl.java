@@ -1,4 +1,4 @@
-package producerconsumer;
+package synchronisation.producerconsumer;
 
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
