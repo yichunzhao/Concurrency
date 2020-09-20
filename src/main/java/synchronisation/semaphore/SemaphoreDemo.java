@@ -10,11 +10,14 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
 /**
- * I build a pool having a pool having 10 threads, it is able to handle 10 cellphone runnable at the same time.
- * and then I use a semaphore to setup a checking point and allowing only 3 runnable that is able to connect to the
+ * Semaphore is used to controlled amount of visitors to visit the limited resources.
+ *
+ * I build a pool having 10 threads, able to handle 10 cellphones at the same time.
+ * and then I use a semaphore to setup a checking point and allowing only 10 runnable that is able to connect to the
  * transmitter.
  * <p>
- * Then in each round there is 3 tasks that can be carried out.
+ * Then in each round there is only 10 cellphones that can be connected.
+ *
  */
 
 @AllArgsConstructor
@@ -40,11 +43,12 @@ class CellPhone implements Runnable {
 
 @Slf4j
 public class SemaphoreDemo {
-    private static final int numOfCellPhone = 10;
+    private static final int numOfCellPhone = 100;
+    private static final int numOfSemaphore = 10;
 
     public static void main(String[] args) throws InterruptedException {
-        //transmitter accept 3 cellphone's connections.
-        Semaphore transmitter = new Semaphore(3);
+        //transmitter accept 10 cellphone's connections.
+        Semaphore transmitter = new Semaphore(numOfSemaphore);
 
         ExecutorService executorService = Executors.newFixedThreadPool(numOfCellPhone);
 
@@ -58,7 +62,7 @@ public class SemaphoreDemo {
         while (!executorService.isTerminated()) {
             executorService.awaitTermination(1000, TimeUnit.MILLISECONDS);
         }
-        log.info("xxx done");
+        log.info("at the end of main thread");
 
     }
 }
