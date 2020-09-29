@@ -9,6 +9,11 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.IntStream;
 
+/**
+ * Barrier is a way to solve race condition. The basic to isolate two different operations on the shared data and
+ * therefore making them in a desired sequence. The barrier is used to prevent B operations on the shared data, until
+ * A Operations all have been carried out.
+ */
 class ShoppingList {
     private int amountOfChips = 1;
 
