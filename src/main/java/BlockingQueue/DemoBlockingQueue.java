@@ -3,12 +3,14 @@ package BlockingQueue;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.IntStream;
 
@@ -37,51 +39,55 @@ interface AccessingQueue<T> {
 
 @Slf4j
 class MyBlockingQueue<T> implements AccessingQueue<T> {
-
     private Queue<T> queue = new LinkedList<>();
 
-    // if the queue is full, blocking the producer.
-    private ReentrantLock tailLock = new ReentrantLock();
+    private ReentrantLock lock = new ReentrantLock();
 
-    // if the queue is empty, blocking the consumer.
-    private ReentrantLock headLock = new ReentrantLock();
+    private Condition queueIsFull = lock.newCondition();
+    private Condition queueIsEmpty = lock.newCondition();
+    private Condition queueNotFull = lock.newCondition();
 
-    private List<T> totalProduced = new ArrayList<>();
-    private List<T> totalConsumed = new ArrayList<>();
+    private List<T> totalProduced = Collections.synchronizedList(new ArrayList<>());
+    private List<T> totalConsumed = Collections.synchronizedList(new ArrayList<>());
 
     @Override
     public void enqueue(T t) throws InterruptedException {
-        tailLock.tryLock();
+        if (lock.tryLock()) log.info("EQ achieved lock");
+
         try {
             //if queue is full wait
-            while (queue.size() == 20) {
-                tailLock.wait();
-                headLock.notifyAll();
+            while (queue.size() >= 20) {
+                queueIsFull.signalAll();
             }
 
-            queue.offer(t);
-            totalProduced.add(t);
+            if (queue.offer(t)) {
+                totalProduced.add(t);
+                log.info("produce: " + t.toString());
+            }
+
+            //waking up one thread to add more;
+            queueNotFull.signal();
+
         } finally {
-            tailLock.unlock();
+            lock.unlock();
         }
     }
 
     // if the queue is empty, blocking the consumer.
     @Override
     public T dequeue() throws InterruptedException {
-        headLock.tryLock();
+        if (lock.tryLock()) log.info("DQ achieved lock");
         try {
             while (queue.isEmpty()) {
-                headLock.wait();
-                tailLock.notifyAll();
+                queueIsEmpty.wait();
             }
 
             T polled = queue.poll();
             totalConsumed.add(polled);
-
+            log.info(" consumed: " + polled.toString());
             return polled;
         } finally {
-            headLock.unlock();
+            lock.unlock();
         }
     }
 
@@ -96,10 +102,10 @@ class MyBlockingQueue<T> implements AccessingQueue<T> {
     }
 }
 
+@Slf4j
 class Producer implements Runnable {
     private AccessingQueue<Integer> queue;
     private Integer seq;
-
 
     public Producer(AccessingQueue queue, Integer seq) {
         this.queue = queue;
@@ -110,16 +116,14 @@ class Producer implements Runnable {
     public void run() {
         try {
             this.queue.enqueue(seq);
-            System.out.println("current thread: " + Thread.currentThread().getName() + " produce: " + seq);
-
 
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
-
 }
 
+@Slf4j
 class Consumer implements Runnable {
     private AccessingQueue<Integer> queue;
     private Integer seq;
@@ -134,8 +138,6 @@ class Consumer implements Runnable {
         while (true) {
             try {
                 Integer number = queue.dequeue();
-                System.out.println("current thread: " + Thread.currentThread().getName() + " consumed: " + number);
-
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -145,31 +147,31 @@ class Consumer implements Runnable {
 }
 
 public class DemoBlockingQueue {
-    private static final int PROD_SIZE = 300;
+    private static final int PROD_SIZE = 100;
 
     public static void main(String[] args) throws InterruptedException {
 
         AccessingQueue<Integer> accessingQueue = new MyBlockingQueue<>();
 
-        ExecutorService service = Executors.newFixedThreadPool(100);
-        ExecutorService consumerService = Executors.newFixedThreadPool(10);
+        ExecutorService service = Executors.newFixedThreadPool(5);
 
         IntStream.rangeClosed(1, PROD_SIZE)
                 .forEach(i -> service.submit(new Producer(accessingQueue, i)));
 
         IntStream.rangeClosed(1, 3)
-                .forEach(i -> consumerService.submit(new Consumer(accessingQueue, i)));
+                .forEach(i -> service.submit(new Consumer(accessingQueue, i)));
 
         service.awaitTermination(2000, TimeUnit.MILLISECONDS);
         service.shutdown();
 
         System.out.println("the executor shuts down? " + service.isShutdown());
 
-        System.out.println("total consumed is equal to 300? " + (accessingQueue.getTotalConsumed().size() == PROD_SIZE));
-        System.out.println("total produced is equal to 300? " + (accessingQueue.getTotalProduced().size() == PROD_SIZE));
+        System.out.println("total consumed is equal? " + (accessingQueue.getTotalConsumed().size() == PROD_SIZE));
+        System.out.println("total produced is equal? " + (accessingQueue.getTotalProduced().size() == PROD_SIZE));
 
         System.out.println("total consumed :" + accessingQueue.getTotalConsumed().size());
         System.out.println("total produced :" + accessingQueue.getTotalProduced().size());
+
         System.exit(1);
     }
 }
