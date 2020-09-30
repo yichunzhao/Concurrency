@@ -17,7 +17,7 @@ class Developer implements Runnable {
 
   @Override
   public void run() {
-    // achieve designer  monitor and lock it.
+    // designer asking threads to wait; releasing designer's lock
     synchronized (designer) {
       try {
         designer.wait();
