@@ -20,10 +20,10 @@ class Storage {
 }
 
 public class DemoWithoutAtomic {
-  private static Storage storage = new Storage();
+  private static final Storage storage = new Storage();
 
-  private static Runnable addTask = () -> storage.addOne();
-  private static Runnable sellTask = () -> storage.sellOne();
+  private static final Runnable addTask = storage::addOne;
+  private static final Runnable sellTask = storage::sellOne;
 
   public static void main(String[] args) throws InterruptedException {
 

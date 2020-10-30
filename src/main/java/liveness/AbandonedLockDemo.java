@@ -13,13 +13,13 @@ public class AbandonedLockDemo {
 
   private static class Philosopher implements Runnable {
 
-    private static int sushiAmount = 20;
+    private static int sushiAmount = 60;
 
-    private Lock chopStick1;
+    private final Lock chopStick1;
 
-    private Lock chopStick2;
+    private final Lock chopStick2;
 
-    private String name;
+    private final String name;
 
     public Philosopher(Lock chopStick1, Lock chopStick2, String name) {
       this.chopStick1 = chopStick1;
