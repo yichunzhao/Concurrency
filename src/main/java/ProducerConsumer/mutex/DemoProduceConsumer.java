@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.IntStream;
@@ -155,13 +157,18 @@ public class DemoProduceConsumer {
     public static void main(String[] args) throws InterruptedException {
         AccessingQueue<Integer> queue = new MyBlockingQueue<>(20);
 
+        ExecutorService service = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+
         IntStream.range(0, PROD_SIZE)
-                .forEach(i -> new Thread(new Producer<>(queue, i)).start());
+                .forEach(i -> service.submit(new Producer<>(queue, i)));
 
         Thread consumer = new Thread(new Consumer<>(queue, 1));
         consumer.start();
 
-        System.out.println("waiting for task done.... ");
+        //Initiates an orderly shutdown in which previously submitted tasks are executed,
+        // but no new tasks will be accepted. Invocation has no additional effect if already shut down.
+        service.shutdown();
+
         Thread.sleep(3000);
 
         consumer.interrupt();
@@ -171,7 +178,6 @@ public class DemoProduceConsumer {
 
         System.out.println("total consumed :" + queue.getTotalConsumed().size());
         System.out.println("total produced :" + queue.getTotalProduced().size());
-
 
         System.exit(0);
     }
