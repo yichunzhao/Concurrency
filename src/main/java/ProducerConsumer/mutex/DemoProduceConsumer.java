@@ -1,9 +1,8 @@
-package ProducerConsumer;
+package ProducerConsumer.mutex;
 
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -27,7 +26,7 @@ interface AccessingQueue<T> {
 
     void enqueue(T t) throws InterruptedException;
 
-    T dequeue() throws InterruptedException;
+    void dequeue() throws InterruptedException;
 
     List<T> getTotalProduced();
 
@@ -49,8 +48,8 @@ class MyBlockingQueue<T> implements AccessingQueue<T> {
     private final Condition queueIsNotFull = lock.newCondition();
     private final Condition queueIsNotEmpty = lock.newCondition();
 
-    private final List<T> totalProduced = Collections.synchronizedList(new ArrayList<>());
-    private final List<T> totalConsumed = Collections.synchronizedList(new ArrayList<>());
+    private final List<T> totalProduced = new ArrayList<>();
+    private final List<T> totalConsumed = new ArrayList<>();
 
     @Override
     public void enqueue(T t) throws InterruptedException {
@@ -78,7 +77,7 @@ class MyBlockingQueue<T> implements AccessingQueue<T> {
 
     // if the queue is empty, blocking the consumer.
     @Override
-    public T dequeue() throws InterruptedException {
+    public void dequeue() throws InterruptedException {
         lock.lock();
 
         try {
@@ -90,7 +89,6 @@ class MyBlockingQueue<T> implements AccessingQueue<T> {
             queueIsNotFull.signalAll();
             totalConsumed.add(polled);
             log.info(" consumed: " + polled.toString());
-            return polled;
         } finally {
             lock.unlock();
         }
@@ -108,11 +106,11 @@ class MyBlockingQueue<T> implements AccessingQueue<T> {
 }
 
 @Slf4j
-class Producer implements Runnable {
-    private AccessingQueue<Integer> queue;
-    private Integer seq;
+class Producer<T> implements Runnable {
+    private final AccessingQueue<T> queue;
+    private final T seq;
 
-    public Producer(AccessingQueue queue, Integer seq) {
+    public Producer(AccessingQueue<T> queue, T seq) {
         this.queue = queue;
         this.seq = seq;
     }
@@ -124,32 +122,31 @@ class Producer implements Runnable {
             Thread.sleep(20);
 
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            log.error("producer", e);
         }
     }
 }
 
 @Slf4j
-class Consumer implements Runnable {
-    private AccessingQueue<Integer> queue;
-    private Integer seq;
+class Consumer<T> implements Runnable {
+    private final AccessingQueue<T> queue;
+    private final T seq;
 
-    public Consumer(AccessingQueue queue, Integer seq) {
+    public Consumer(AccessingQueue<T> queue, T seq) {
         this.queue = queue;
         this.seq = seq;
     }
 
     @Override
     public void run() {
-        while (!Thread.currentThread().isInterrupted()) {
+        while (!Thread.interrupted()) {
             try {
                 queue.dequeue();
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                log.error("consumer error: ", e);
             }
         }
     }
-
 }
 
 public class DemoProduceConsumer {
@@ -159,13 +156,14 @@ public class DemoProduceConsumer {
         AccessingQueue<Integer> queue = new MyBlockingQueue<>(20);
 
         IntStream.range(0, PROD_SIZE)
-                .forEach(i -> new Thread(new Producer(queue, i)).start());
+                .forEach(i -> new Thread(new Producer<>(queue, i)).start());
 
-        Thread consumer = new Thread(new Consumer(queue, 1));
+        Thread consumer = new Thread(new Consumer<>(queue, 1));
         consumer.start();
 
         System.out.println("waiting for task done.... ");
-        Thread.sleep(1000);
+        Thread.sleep(3000);
+
         consumer.interrupt();
 
         System.out.println("total consumed is equal? " + (queue.getTotalConsumed().size() == PROD_SIZE));
@@ -174,6 +172,7 @@ public class DemoProduceConsumer {
         System.out.println("total consumed :" + queue.getTotalConsumed().size());
         System.out.println("total produced :" + queue.getTotalProduced().size());
 
-        System.exit(1);
+
+        System.exit(0);
     }
 }
