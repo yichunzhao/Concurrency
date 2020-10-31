@@ -154,7 +154,7 @@ class Consumer implements Runnable {
 
 }
 
-public class DemoBlockingQueue {
+public class DemoProduceConsumer {
     private static final int PROD_SIZE = 100;
 
     public static void main(String[] args) throws InterruptedException {
