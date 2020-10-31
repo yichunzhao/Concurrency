@@ -7,8 +7,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.IntStream;
@@ -158,26 +156,23 @@ public class DemoProduceConsumer {
     private static final int PROD_SIZE = 100;
 
     public static void main(String[] args) throws InterruptedException {
-
-        AccessingQueue<Integer> accessingQueue = new MyBlockingQueue<>(20);
-
-        ExecutorService service = Executors.newFixedThreadPool(5);
+        AccessingQueue<Integer> queue = new MyBlockingQueue<>(20);
 
         IntStream.range(0, PROD_SIZE)
-                .forEach(i -> new Thread(new Producer(accessingQueue, i)).start());
+                .forEach(i -> new Thread(new Producer(queue, i)).start());
 
-        Thread consumer = new Thread(new Consumer(accessingQueue, 1));
+        Thread consumer = new Thread(new Consumer(queue, 1));
         consumer.start();
 
         System.out.println("waiting for task done.... ");
-        Thread.sleep(2000);
+        Thread.sleep(1000);
         consumer.interrupt();
 
-        System.out.println("total consumed is equal? " + (accessingQueue.getTotalConsumed().size() == PROD_SIZE));
-        System.out.println("total produced is equal? " + (accessingQueue.getTotalProduced().size() == PROD_SIZE));
+        System.out.println("total consumed is equal? " + (queue.getTotalConsumed().size() == PROD_SIZE));
+        System.out.println("total produced is equal? " + (queue.getTotalProduced().size() == PROD_SIZE));
 
-        System.out.println("total consumed :" + accessingQueue.getTotalConsumed().size());
-        System.out.println("total produced :" + accessingQueue.getTotalProduced().size());
+        System.out.println("total consumed :" + queue.getTotalConsumed().size());
+        System.out.println("total produced :" + queue.getTotalProduced().size());
 
         System.exit(1);
     }
