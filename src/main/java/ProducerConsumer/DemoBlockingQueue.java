@@ -1,4 +1,4 @@
-package BlockingQueue;
+package ProducerConsumer;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.IntStream;
@@ -39,25 +38,30 @@ interface AccessingQueue<T> {
 
 @Slf4j
 class MyBlockingQueue<T> implements AccessingQueue<T> {
-    private Queue<T> queue = new LinkedList<>();
+    private final int maxSize;
 
-    private ReentrantLock lock = new ReentrantLock();
+    public MyBlockingQueue(int maxSize) {
+        this.maxSize = maxSize;
+    }
 
-    private Condition queueIsFull = lock.newCondition();
-    private Condition queueIsEmpty = lock.newCondition();
-    private Condition queueNotFull = lock.newCondition();
+    private final Queue<T> queue = new LinkedList<>();
 
-    private List<T> totalProduced = Collections.synchronizedList(new ArrayList<>());
-    private List<T> totalConsumed = Collections.synchronizedList(new ArrayList<>());
+    private final ReentrantLock lock = new ReentrantLock();
+
+    private final Condition queueIsNotFull = lock.newCondition();
+    private final Condition queueIsNotEmpty = lock.newCondition();
+
+    private final List<T> totalProduced = Collections.synchronizedList(new ArrayList<>());
+    private final List<T> totalConsumed = Collections.synchronizedList(new ArrayList<>());
 
     @Override
     public void enqueue(T t) throws InterruptedException {
-        if (lock.tryLock()) log.info("EQ achieved lock");
+        lock.lock();
 
         try {
-            //if queue is full wait
-            while (queue.size() >= 20) {
-                queueIsFull.signalAll();
+            //wait until queue is not full.
+            while (queue.size() >= maxSize) {
+                queueIsNotFull.await();
             }
 
             if (queue.offer(t)) {
@@ -66,23 +70,26 @@ class MyBlockingQueue<T> implements AccessingQueue<T> {
             }
 
             //waking up one thread to add more;
-            queueNotFull.signal();
+            queueIsNotEmpty.signalAll();
 
         } finally {
             lock.unlock();
         }
     }
 
+
     // if the queue is empty, blocking the consumer.
     @Override
     public T dequeue() throws InterruptedException {
-        if (lock.tryLock()) log.info("DQ achieved lock");
+        lock.lock();
+
         try {
             while (queue.isEmpty()) {
-                queueIsEmpty.wait();
+                queueIsNotEmpty.await();
             }
 
             T polled = queue.poll();
+            queueIsNotFull.signalAll();
             totalConsumed.add(polled);
             log.info(" consumed: " + polled.toString());
             return polled;
@@ -116,6 +123,7 @@ class Producer implements Runnable {
     public void run() {
         try {
             this.queue.enqueue(seq);
+            Thread.sleep(20);
 
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -135,9 +143,9 @@ class Consumer implements Runnable {
 
     @Override
     public void run() {
-        while (true) {
+        while (!Thread.currentThread().isInterrupted()) {
             try {
-                Integer number = queue.dequeue();
+                queue.dequeue();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -151,20 +159,19 @@ public class DemoBlockingQueue {
 
     public static void main(String[] args) throws InterruptedException {
 
-        AccessingQueue<Integer> accessingQueue = new MyBlockingQueue<>();
+        AccessingQueue<Integer> accessingQueue = new MyBlockingQueue<>(20);
 
         ExecutorService service = Executors.newFixedThreadPool(5);
 
-        IntStream.rangeClosed(1, PROD_SIZE)
-                .forEach(i -> service.submit(new Producer(accessingQueue, i)));
+        IntStream.range(0, PROD_SIZE)
+                .forEach(i -> new Thread(new Producer(accessingQueue, i)).start());
 
-        IntStream.rangeClosed(1, 3)
-                .forEach(i -> service.submit(new Consumer(accessingQueue, i)));
+        Thread consumer = new Thread(new Consumer(accessingQueue, 1));
+        consumer.start();
 
-        service.awaitTermination(2000, TimeUnit.MILLISECONDS);
-        service.shutdown();
-
-        System.out.println("the executor shuts down? " + service.isShutdown());
+        System.out.println("waiting for task done.... ");
+        Thread.sleep(2000);
+        consumer.interrupt();
 
         System.out.println("total consumed is equal? " + (accessingQueue.getTotalConsumed().size() == PROD_SIZE));
         System.out.println("total produced is equal? " + (accessingQueue.getTotalProduced().size() == PROD_SIZE));
