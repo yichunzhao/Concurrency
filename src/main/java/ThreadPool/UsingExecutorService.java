@@ -43,6 +43,10 @@ class Task implements Runnable {
 }
 
 public class UsingExecutorService {
+  // pool size selection depends on task cpu intensive or not; on this case select pool size rer.
+  // to cpu numbers
+  private static int numberOfCpu = Runtime.getRuntime().availableProcessors();
+
   public static void main(String... args) throws InterruptedException {
     BookRepository bookRepository = new BookRepository();
 
@@ -53,10 +57,6 @@ public class UsingExecutorService {
 
     // ExecutorService interface
     ExecutorService executorService;
-
-    // pool size selection depends on task cpu intensive or not; on this case select pool size rer.
-    // to cpu numbers
-    int numberOfCpu = Runtime.getRuntime().availableProcessors();
 
     start = Instant.now();
 
