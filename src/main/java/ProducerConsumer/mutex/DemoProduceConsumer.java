@@ -23,6 +23,8 @@ import java.util.stream.IntStream;
  * <p>
  * features:  fairness; the thread doesn't need to block infinitely after trying a certain amount time; ability to
  * interrupt thread while waiting for Lock; try lock time out
+ *
+ * producer and consumer pattern allows communication between different threads.
  */
 interface AccessingQueue<T> {
 
