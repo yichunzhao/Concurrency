@@ -50,6 +50,8 @@ public class UsingConcurrentHashMap {
     static {
         concurrentMap.putIfAbsent("Lenovo", 1300);
         map.putIfAbsent("Lenovo", 1300);
+        map.put("Dell", 2300);
+        map.put("Mac", 6999);
     }
 
     /**
@@ -101,5 +103,25 @@ public class UsingConcurrentHashMap {
 
         concurrentMap.replace("Lenovo", 4500);
         log.info(concurrentMap.toString());
+
+        //modify a map entry while traverse it.
+        //this should cause a ConcurrentModificationException
+        //the element "Lenovo" is removed, but also triggering an exception.
+        log.info("map example::::::" + map.toString());
+        try {
+            map.forEach((k, v) -> {
+                if (k.equals("Lenovo")) map.remove("Lenovo");
+            });
+        } catch (Exception e) {
+            log.error("removing element as travers elements: ", e);
+        }
+
+        //it won't cause the error as working on the concurrent map
+        log.info("concurrent map: " + concurrentMap.toString());
+        concurrentMap.forEach((k, v) -> {
+            if (k.equals("Lenovo")) concurrentMap.remove("Lenovo");
+        });
+        log.info("removing from concurrent map: " + concurrentMap.toString());
+
     }
 }
