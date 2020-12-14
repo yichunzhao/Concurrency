@@ -7,8 +7,8 @@ import java.util.Arrays;
  */
 public class SequentialMatrixMultiplier {
     private int[][] mA, mB;
-    private int rowNumbOfA, colNumOfA, colNumOfB;
-    private int rowNumOfB;
+    private int rowNumOfA, colNumOfA;
+    private int colNumOfB, rowNumOfB;
 
     public SequentialMatrixMultiplier(int[][] mA, int[][] mB) {
         if (colNumOfA != rowNumOfB)
@@ -17,7 +17,7 @@ public class SequentialMatrixMultiplier {
         this.mA = mA;
         this.mB = mB;
 
-        rowNumbOfA = mA.length;
+        rowNumOfA = mA.length;
         colNumOfA = mA[0].length;
 
         rowNumOfB = mB.length;
@@ -25,9 +25,9 @@ public class SequentialMatrixMultiplier {
     }
 
     public int[][] product() {
-        int[][] result = new int[rowNumbOfA][colNumOfB];
+        int[][] result = new int[rowNumOfA][colNumOfB];
 
-        for (int p = 0; p < rowNumbOfA; p++) {
+        for (int p = 0; p < rowNumOfA; p++) {
             for (int q = 0; q < colNumOfB; q++) {
                 result[p][q] = sum(p, q);
             }
