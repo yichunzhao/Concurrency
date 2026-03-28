@@ -1,5 +1,52 @@
-# Concurrency
+# Java Concurrency Learning Repository
 
+This repository contains my practice and learning materials on the topic of Java Concurrency. The code is structured around various core concepts and advanced mechanisms provided by the Java concurrent API.
+
+## Topics Covered
+
+### 1. Threads Basics (`Threads/`)
+- Creating and managing threads
+- Daemon threads (`KitchenDemonDemo`)
+- Data races and basic synchronization (`DataRaceDemo`)
+- Atomic variables (`AtomicVariableDemo`)
+
+### 2. Thread Pools and Executors (`ThreadPool/`)
+- Using `ExecutorService` (`ExecutorServiceSingleThread`, `UsingExecutorService`)
+- Exploring `Callable` and `Future` for async execution (`DemoUsingFutureCallable`)
+- Scheduled thread pools (`ScheduledThreadPool`)
+- Cached vs Fixed thread pools
+
+### 3. Synchronization & Locks (`Lock/`, `synchronisation/`)
+- **Explicit Locks**: `ReentrantLock` (`ReentrantLockDemo`), `ReadWriteLock` (`ReadWriteLockDemo`)
+- Methods like `tryLock()` (`TryLockDemo`)
+- Avoiding abandoned locks
+
+### 4. Concurrent Collections (`ConcurrentCollection/`, `SyncCollections/`)
+- **Thread-safe Collections**: `ConcurrentMap`, `CopyOnWrite` collections, `BlockingQueue`
+- **Synchronized Collections**: `SyncMap`, `SyncSet`
+- Avoiding `ConcurrentModificationException`
+
+### 5. Race Conditions and Coordination (`racecondition/`)
+- **CountDownLatch**: Synchronizing one or more threads to wait for a set of operations (`CountDownLatchDemo`)
+- Barriers and Latches
+
+### 6. The Producer-Consumer Pattern (`ProducerConsumer/`)
+- Implementation using basic Mutexes
+- Implementation using Semaphores
+
+### 7. Liveness (`liveness/`)
+- Understanding and simulating **Deadlocks**
+- Dealing with abandoned locks
+
+### 8. Asynchronous Tasks & Parallelism (`asynctasks/`, `parallel/`)
+- Divide and Conquer approach (`divideconquer/`)
+- Futures
+- Parallel algorithms like Sequential Matrix Multiplier
+
+### 9. Volatile & Atomic Variables (`VolatileAndAtomicVar/`)
+- Core Java memory model concepts
+- Ensuring visibility with `volatile`
+- Lock-free thread-safety with `Atomic` classes
 
 ## Parallel Programs
 
